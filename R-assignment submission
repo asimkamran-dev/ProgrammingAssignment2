@@ -1,0 +1,60 @@
+# Define the combined functions
+
+makeCacheMatrix <- function(x = matrix()) {
+  inv <- NULL  # Variable to store the inverse
+  
+  # Set the value of the matrix
+  set <- function(y) {
+    x <<- y
+    inv <<- NULL  # Reset the inverse when a new matrix is set
+  }
+  
+  # Get the value of the matrix
+  get <- function() x
+  
+  # Set the value of the inverse
+  setInverse <- function(inverse) inv <<- inverse
+  
+  # Get the value of the inverse
+  getInverse <- function() inv
+  
+  # Return a list of functions to interact with the matrix and its inverse
+  list(set = set, get = get, 
+       setInverse = setInverse, 
+       getInverse = getInverse)
+}
+
+cacheSolve <- function(x, ...) {
+  # Retrieve the cached inverse
+  inv <- x$getInverse()
+  
+  # If the inverse is already cached, return it
+  if (!is.null(inv)) {
+    message("getting cached data")
+    return(inv)
+  }
+  
+  # Otherwise, calculate the inverse
+  data <- x$get()  # Get the matrix
+  inv <- solve(data, ...)  # Compute the inverse
+  
+  # Cache the inverse
+  x$setInverse(inv)
+  
+  # Return the inverse
+  inv
+}
+
+# Example usage:
+
+# Create a special matrix object
+myMatrix <- makeCacheMatrix(matrix(c(1, 2, 3, 4), 2, 2))
+
+# Compute the inverse for the first time (not cached)
+inverse <- cacheSolve(myMatrix)
+print(inverse)
+
+# Get the cached inverse without recomputing
+inverse_cached <- cacheSolve(myMatrix)
+print(inverse_cached)
+
